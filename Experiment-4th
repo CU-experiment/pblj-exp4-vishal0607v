@@ -1,0 +1,208 @@
+Experiment : 4
+
+Easy :
+
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+class Employee {
+    int id;
+    String name;
+    double salary;
+
+    Employee(int id, String name, double salary) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+    }
+
+    public String toString() {
+        return "ID: " + id + ", Name: " + name + ", Salary: " + salary;
+    }
+}
+
+public class EmployeeManagement {
+    static ArrayList<Employee> employees = new ArrayList<>();
+    static Scanner sc = new Scanner(System.in);
+
+    public static void addEmployee() {
+        System.out.print("Enter ID: ");
+        int id = sc.nextInt();
+        sc.nextLine();
+        System.out.print("Enter Name: ");
+        String name = sc.nextLine();
+        System.out.print("Enter Salary: ");
+        double salary = sc.nextDouble();
+        employees.add(new Employee(id, name, salary));
+        System.out.println("Employee added successfully!");
+    }
+
+    public static void updateEmployee() {
+        System.out.print("Enter Employee ID to update: ");
+        int id = sc.nextInt();
+        for (Employee emp : employees) {
+            if (emp.id == id) {
+                sc.nextLine();
+                System.out.print("Enter new Name: ");
+                emp.name = sc.nextLine();
+                System.out.print("Enter new Salary: ");
+                emp.salary = sc.nextDouble();
+                System.out.println("Employee updated successfully!");
+                return;
+            }
+        }
+        System.out.println("Employee not found!");
+    }
+
+    public static void removeEmployee() {
+        System.out.print("Enter Employee ID to remove: ");
+        int id = sc.nextInt();
+        employees.removeIf(emp -> emp.id == id);
+        System.out.println("Employee removed successfully!");
+    }
+
+    public static void searchEmployee() {
+        System.out.print("Enter Employee ID to search: ");
+        int id = sc.nextInt();
+        for (Employee emp : employees) {
+            if (emp.id == id) {
+                System.out.println(emp);
+                return;
+            }
+        }
+        System.out.println("Employee not found!");
+    }
+
+    public static void displayEmployees() {
+        for (Employee emp : employees) {
+            System.out.println(emp);
+        }
+    }
+
+    public static void main(String[] args) {
+        while (true) {
+            System.out.println("\n1. Add Employee\n2. Update Employee\n3. Remove Employee\n4. Search Employee\n5. Display Employees\n6. Exit");
+            System.out.print("Enter choice: ");
+            int choice = sc.nextInt();
+            switch (choice) {
+                case 1 -> addEmployee();
+                case 2 -> updateEmployee();
+                case 3 -> removeEmployee();
+                case 4 -> searchEmployee();
+                case 5 -> displayEmployees();
+                case 6 -> System.exit(0);
+                default -> System.out.println("Invalid choice!");
+            }
+        }
+    }
+}
+
+Medium :
+
+import java.util.*;
+
+class Card {
+    String symbol;
+    String value;
+
+    Card(String symbol, String value) {
+        this.symbol = symbol;
+        this.value = value;
+    }
+
+    public String toString() {
+        return value + " of " + symbol;
+    }
+}
+
+public class CardCollection {
+    static HashSet<Card> cardSet = new HashSet<>();
+
+    public static void addCard(String symbol, String value) {
+        cardSet.add(new Card(symbol, value));
+    }
+
+    public static void searchCardsBySymbol(String symbol) {
+        System.out.println("Cards with symbol " + symbol + ":");
+        for (Card card : cardSet) {
+            if (card.symbol.equalsIgnoreCase(symbol)) {
+                System.out.println(card);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        addCard("Hearts", "Ace");
+        addCard("Hearts", "King");
+        addCard("Spades", "Queen");
+        addCard("Diamonds", "Jack");
+
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter a symbol to search (Hearts, Diamonds, Clubs, Spades): ");
+        String symbol = sc.nextLine();
+        searchCardsBySymbol(symbol);
+        sc.close();
+    }
+}
+
+Hard : 
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+class TicketBookingSystem {
+    private int availableSeats = 5;
+    private final Lock lock = new ReentrantLock();
+
+    public void bookTicket(String customerType) {
+        lock.lock();
+        try {
+            if (availableSeats > 0) {
+                System.out.println(customerType + " booking a seat...");
+                Thread.sleep(1000);
+                availableSeats--;
+                System.out.println(customerType + " booked a seat. Remaining seats: " + availableSeats);
+            } else {
+                System.out.println(customerType + " tried to book, but no seats left.");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+
+class Customer extends Thread {
+    TicketBookingSystem bookingSystem;
+    String customerType;
+
+    Customer(TicketBookingSystem system, String type, int priority) {
+        this.bookingSystem = system;
+        this.customerType = type;
+        this.setPriority(priority);
+    }
+
+    public void run() {
+        bookingSystem.bookTicket(customerType);
+    }
+}
+
+public class TicketBookingApp {
+    public static void main(String[] args) {
+        TicketBookingSystem system = new TicketBookingSystem();
+
+        Customer vip1 = new Customer(system, "VIP Customer 1", Thread.MAX_PRIORITY);
+        Customer vip2 = new Customer(system, "VIP Customer 2", Thread.MAX_PRIORITY);
+        Customer normal1 = new Customer(system, "Normal Customer 1", Thread.NORM_PRIORITY);
+        Customer normal2 = new Customer(system, "Normal Customer 2", Thread.NORM_PRIORITY);
+        Customer normal3 = new Customer(system, "Normal Customer 3", Thread.MIN_PRIORITY);
+
+        vip1.start();
+        vip2.start();
+        normal1.start();
+        normal2.start();
+        normal3.start();
+    }
+}
